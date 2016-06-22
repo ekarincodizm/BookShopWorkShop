@@ -1,0 +1,69 @@
+﻿@model List<iCONEXTWorkShop.ViewModels.ManageProductViewModel>
+@{
+    ViewBag.Title = "ManageProductView";
+}
+
+<div class="container">
+    <h2>Product Manage</h2>
+    @Html.ActionLink("AddProduct","AddBook","ManageProduct", new {@class="btn btn-success"})
+    <br>
+
+    <br>
+    <table id="productTable" class="display table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Balance</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in @Model)
+        {
+            if (!item.IsActive)
+            {
+                continue;
+            }
+            
+            <tr>
+                <th>@item.Title</th>
+                <th>@item.Author</th>
+                <th>@item.CategoryName</th>
+                <th>@item.Price</th>
+                <th>@item.Balance</th>
+                <th>
+                    @using (@Html.BeginForm("EditProduct", "ManageProduct", FormMethod.Get, new { @style = "display: inline;" }))
+                    {
+                        @Html.Hidden("productId", @item.Id)
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    }
+                    
+                    @using (@Html.BeginForm("DeleteProduct", "ManageProduct", FormMethod.Post, new {@style = "display: inline;"}))
+                    {
+                        @Html.Hidden("productId", @item.Id)
+                        <button type="submit"class="btn btn-danger" onclick="return confirm('Are You Sure To Delete this product')">
+                            <i class="fa fa-trash-o"></i>
+                        </button>
+                    }
+                </th>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/Datatable")
+    <script>
+        $(document).ready(function () {
+            $('#productTable').DataTable();
+        });
+    </script>
+}
+

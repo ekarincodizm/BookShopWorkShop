@@ -1,0 +1,230 @@
+﻿@{
+    ViewBag.Title = "Shopping Cart";
+}
+<style>
+    .product-amount {
+        width: 70px;
+    }
+
+    .detail-content {
+        /*margin-top: 20px;*/
+    }
+
+    .col-image {
+        height: 160px;
+    }
+
+    .book-image {
+        height: 100%;
+    }
+
+    .col-addcart-button {
+        padding-left: 0;
+    }
+    .book {
+        height: 150px;
+        width: 100px;
+    }
+</style>
+<div class="container">
+    <ul class="breadcrumb">
+        <li><a href=@Url.Action("Index", "Home" )>Home</a></li>
+        <li class="active">Shopping Cart</li>
+    </ul>
+    <div class="row">
+        <div class="col-md-12">
+            <h2 id="header">Shopping Cart</h2>
+            <div id="container_cart">
+
+            </div>
+            <div style="float: right; text-align: right;" id="footer_header">
+                <p>
+                    <span id="total_price"></span> Baht
+                </p>
+                <p>
+                    <span id="total_discount"></span> Baht
+                </p>
+                <p>
+                    <span id="total"></span> Baht
+                </p>
+            </div>
+            <div style="float: right; text-align: right; padding-right: 20px;" id="footer_data">
+                <p>Price</p>
+                <p>Discount</p>
+                <p>Total</p>
+            </div>
+            <div class="clearfix">
+            </div>
+            <hr />
+        </div>
+        <button id="confirmBtn" class="btn btn-success" onclick="confirmShopingCart()" style="float: right">Confirm</button>
+    </div>
+</div>
+    @section scripts
+{
+        <script type="text/javascript">
+            function confirmShopingCart() {
+  $.ajax({
+                url: '@Url.Action("ConfirmShoppingCart", "ShoppingCart")',
+                type: 'POST',
+                dataType: 'json'
+            })
+            .done(function(data) {
+                if (data.StatusCode == 200) {
+                      getCartStatus()
+                      var data_div = '';
+                      $('#footer_data').hide();
+                      $('#footer_header').hide();
+                      $('#container_cart div').fadeOut("slow");
+                      $('#container_cart').hide();
+                      $('#confirmBtn').hide();
+                      $('#header').hide();
+                      data_div += '<div class="container">';
+                      data_div += '<h2 class="text-center">Congratulation!</h2>';
+                      data_div += '<p class="text-center">คำสั่งซื้อของคุณ ได้รับการบันทึกแล้ว คุณสามารถพิมพ์ใบเสร็จได้ ด้วยการกดปุ่มด้านล่างครับ</p>';
+                      data_div += '<center><a class="btn btn-primary" target="_blank" href="@Url.Action("Index","Bill")?orderId=' + data.Message + '">พิมพ์</a></center>';
+                      data_div += '</div>'
+                      $('#container_cart').html(data_div);
+                      $('#container_cart').fadeIn("slow");
+                } else {
+                  new PNotify({
+                      title: 'Status',
+                      text: data.Message,
+                      icon: 'glyphicon glyphicon-envelope',
+                      type: 'error'
+                  });
+                }
+            })
+            .fail(function() {
+                console.log("summary cart error");
+            })
+            .always(function() {
+                console.log("summary cart complete");
+            });
+}
+
+            function changeTotalBook(cartId) {
+                var totalbook = $('#total_q_' + cartId).val();
+                $.ajax({
+                        url: '@Url.Action("UpdateBookTotalInCart", "ShoppingCart")',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            Id: cartId,
+                            quantity: totalbook
+                        }
+                    })
+                    .done(function(data) {
+                        if (data.StatusCode == 200) {
+                            var totalSum = parseInt($('#total_b_' + cartId).text()) * totalbook;
+                            $('#total_sum_' + cartId).text(totalSum);
+                            $.ajax({
+                                    url: '@Url.Action("GetShoppingCartList", "ShoppingCart")',
+                                    type: 'POST',
+                                    dataType: 'json'
+                                })
+                                .done(function(data) {
+                                    $('#total_price').text(data.Price);
+                                    $('#total_discount').text(data.Discount);
+                                    $('#total').text(data.Total);
+                                });
+                        } else {
+                            alert(data.Message)
+                        }
+
+                    })
+                    .fail(function() {
+                        console.log("summary cart error");
+                    })
+                    .always(function() {
+                        console.log("summary cart complete");
+                    });
+            }
+
+            function deleteItem(Product_Id) {
+                $.ajax({
+                        url: '@Url.Action("DeleteCart", "ShoppingCart")',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: { Id: Product_Id }
+                    })
+                    .done(function(data) {
+                        if (data.StatusCode == 200) {
+                            $("#cartdata_" + Product_Id).fadeOut("slow");
+                            getCartStatus()
+                            $.ajax({
+                                    url: '@Url.Action("GetShoppingCartList", "ShoppingCart")',
+                                    type: 'POST',
+                                    dataType: 'json'
+                                })
+                                .done(function(data) {
+                                    $('#total_price').text(data.Price);
+                                    $('#total_discount').text(data.Discount);
+                                    $('#total').text(data.Total);
+                                });
+                        } else {
+                            alert(data.Message)
+                        }
+
+                    })
+                    .fail(function() {
+                        console.log("summary cart error");
+                    })
+                    .always(function() {
+                        console.log("summary cart complete");
+                    });
+
+            }
+
+            function loadList() {
+                $('#container_cart').hide();
+                $.ajax({
+                        url: '@Url.Action("GetShoppingCartList", "ShoppingCart")',
+                        type: 'POST',
+                        dataType: 'json'
+                    })
+                    .done(function(data) {
+                        var data_div = '';
+                        $.each(data.PoductList, function(index, val) {
+                            data_div += '<div class="panel panel-default" style="padding: 5px;" id="cartdata_' + val.ProductId + '">'
+                            data_div += '<a href="javascript:deleteItem(' + val.ProductId + ')" style="float: right;"><span class="glyphicon glyphicon-remove"></span></a>';
+                            data_div += '<div class="panel-body">';
+                            data_div += '<div class="col-xs-3" style="padding-top: 10px;" align="center">'
+                            data_div += '<img style="border-radius: 10px; max-width: 150px;" alt="book1" src="' + val.Image + '" height="200px" width="100%">'
+                            data_div += '</div>';
+                            data_div += '<div class="col-xs-4" style="padding-top: 10px;">';
+                            data_div += '<p>ชื่อ ' + val.Title + '</p>';
+                            data_div += '<p>ชื่อผู้แต่ง ' + val.Author + '</p>';
+                            data_div += '<p>ราคาเล่มละ <span id="total_b_' + val.ProductId + '">' + val.Price + '</span> บาท</p>';
+                            data_div += '</div>';
+                            data_div += '<div class="col-xs-3" style="padding-top: 10px;">';
+                            data_div += '<p>';
+                            data_div += '<input type="number" onchange="changeTotalBook(' + val.ProductId + ')" id="total_q_' + val.ProductId + '" style="max-width: 100px; text-align: center;" value="' + val.Quantity + '" max="' + val.Balance + '" min="1"/>';
+                            data_div += '</p>';
+                            data_div += '</div>';
+                            data_div += '<div class="col-xs-2" style="padding-top: 10px;">';
+                            data_div += '<p><span id="total_sum_' + val.ProductId + '">' + val.PriceSum + '</span> baht</p>';
+                            data_div += '</div>';
+                            data_div += '</div>';
+                            data_div += '</div>';
+                        });
+                        $('#container_cart').html(data_div);
+                        $('#container_cart').fadeIn("slow");
+                        $('#total_price').text(data.Price);
+                        $('#total_discount').text(data.Discount);
+                        $('#total').text(data.Total);
+                    })
+                    .fail(function() {
+                        console.log("summary cart error");
+                    })
+                    .always(function() {
+                        console.log("summary cart complete");
+                    });
+            }
+
+            $(document).ready(function() {
+                loadList()
+            });
+        </script>
+
+    }

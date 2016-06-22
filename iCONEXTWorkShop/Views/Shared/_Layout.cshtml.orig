@@ -1,0 +1,195 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="~/Content/images/Icon/icon.png" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - BookStore</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/AwesomeFont")
+    @Styles.Render("~/Content/pnotify")
+
+    @{
+        var mapLink = "https://www.google.co.th/maps/place/%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%A9%E0%B8%B1%E0%B8%97+%E0%B9%84%E0%B8%AD%E0%B9%82%E0%B8%84%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%81%E0%B8%8B%E0%B9%8C+%E0%B8%88%E0%B8%B3%E0%B8%81%E0%B8%B1%E0%B8%94/@13.7675681,100.5686116,17z/data=!3m1!4b1!4m5!3m4!1s0x30e29c352ce0a1f3:0xe274442d6a71ac67!8m2!3d13.7675629!4d100.5708003";
+        var facebookLink = "https://www.facebook.com/pages/%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%A9%E0%B8%B1%E0%B8%97-%E0%B9%84%E0%B8%AD%E0%B9%82%E0%B8%84%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%81%E0%B8%8B%E0%B9%8C-%E0%B8%88%E0%B8%B3%E0%B8%81%E0%B8%B1%E0%B8%94-iCONEXT-CoLtd/131807756887348";
+    }
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top" style="z-index: 10000">
+        <div class="container">
+            <div class="col-md-3">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    @try
+                    {
+                        if (SessionManager.UserData.UserClassId == 1)
+                        {
+                            <a href="@Url.Action("Index", "Home")" class="navbar-brand">
+                                <span>
+                                    <i class="fa fa-book"></i>
+                                    BookStore
+                                </span>
+                            </a>
+                        }
+                        else if (SessionManager.UserData.UserClassId == 2)
+                        {
+                            <span class="navbar-brand">
+                                <i class="fa fa-cogs"></i>
+                                ManageBookStore
+                            </span>
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        <a href="@Url.Action("Index", "Home")" class="navbar-brand">
+                            <span>
+                                <i class="fa fa-book"></i>
+                                BookStore
+                            </span>
+                        </a>
+                    }
+                    
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav"></ul>
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content" style="margin-top: 20px;">
+        <div class="row">
+            <div class="col-md-2" style="position: fixed">
+                @{
+                    var routeValues = Request.RequestContext.RouteData.Values;
+                    var controller = routeValues["controller"].ToString();
+
+                    if (controller != "Account" && controller != "Login")
+                    {
+                        @Html.Action("Category", "Home");
+                    }
+
+                }
+
+
+            </div>
+            <div class="col-md-10 col-md-offset-2">
+                @RenderBody()
+            </div>
+        </div>
+        <hr />
+        <footer>
+            <div class="col-md-4">
+
+                <h3>iCONEXT<span>BookShop</span></h3>
+
+                <p class="footer-links">
+                </p>
+
+                <p>&copy; @DateTime.Now.Year -  iCONEXT CO., LTD.</p>
+            </div>
+            <div class="col-md-4">
+
+                <div class="row">
+                    <div class="col-md-1"><i class="fa fa-map-marker"></i></div>
+                    <div class="col-md-11"><a href="@mapLink" target="_blank"><span>121/30, RS Tower Building, 7th Floor, Ratchadapisek Road, Dindaeng, Bangkok 10400 THAILAND</span></a></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-1">
+                        <i class="fa fa-phone"></i>
+                    </div>
+                    <div class="col-md-11">
+                        <a href="tel:+66-2-642-3608">+66-2-642-3608</a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-1">
+                        <i class="fa fa-envelope"></i>
+                    </div>
+                    <div class="col-md-11">
+                        <a href="mailto:iCONEXT@iCONECT.co.th">iCONEXT@iconext.co.th</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <p class="footer-company-about">
+                    <strong>
+                        We provide “IT One-Stop Solution Service”.
+                    </strong>
+                    Our main business is to provide various IT relating services e.g. system consulting service to support customers’ business activities
+                </p>
+
+                <div class="footer-icons">
+                    <a href="@facebookLink" target="_blank"><i class="fa fa-facebook"></i></a>
+                    <a href="#"><i class="fa fa-twitter"></i></a>
+                    <a href="#"><i class="fa fa-linkedin"></i></a>
+                    <a href="#"><i class="fa fa-github"></i></a>
+                </div>
+
+            </div>
+
+
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+<<<<<<< HEAD
+    @using iCONEXTWorkShop.Helper
+    @if (SessionManager.UserData!=null)
+{
+=======
+    @using iCONEXTWorkShop.Helper    @using Microsoft.AspNet.Identity
+    @if (Request.IsAuthenticated)
+    {
+>>>>>>> origin/Development
+        <script type="text/javascript">
+            function getCartStatus() {
+                $.ajax({
+                    url: '@Url.Action("CartStatus", "Home")',
+                    type: 'GET',
+                    dataType: 'json'
+                })
+                    .done(function (data) {
+                        if (data.StatusCode == '200') {
+                            $('#status').text(data.Message)
+                        }
+                        else {
+                            alert(data.Message)
+                        }
+                    })
+                    .fail(function () {
+                        console.log("ajax_status error");
+                    })
+                    .always(function () {
+                        console.log("ajax_status complete");
+                    });
+            }
+            $(document).ready(function () {
+                getCartStatus()
+            });
+        </script>
+    }
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/pace")
+    @Scripts.Render("~/bundles/bxslider")
+    @Scripts.Render("~/bundles/pagination")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/pnotify")
+    @RenderSection("scripts", required: false)
+
+
+</body>
+</html>

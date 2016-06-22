@@ -1,0 +1,49 @@
+﻿@using Antlr.Runtime.Tree
+@model List<iCONEXTWorkShop.ViewModels.CategoryViewModel>
+@{
+    Layout = null;
+}
+
+<form method="get" class="form-inline" action=@Url.Action("SearchProduct","Home")>
+    <div class="form-group">
+        <div class="input-group">
+            <input type="text" class="form-control" name="searchText" placeholder="Search...">
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+            </span>
+        </div>
+    </div>
+
+
+</form>
+
+<div class="list-group" style="margin-top: 20px;">
+    @{
+        var routeValues = Request.RequestContext.RouteData.Values;
+        var controller = routeValues["controller"].ToString();
+        var action = routeValues["action"].ToString();
+        var id = routeValues["id"] != null ? routeValues["id"].ToString() : string.Empty;
+        string active = "";
+
+        if (id == "" && controller == "Home" && action == "Index")
+        {
+            active = "active";
+        }
+    }
+
+    <a href="@Url.Action("Index", "Home")" class="list-group-item @active">
+        <i class="fa fa-caret-right "></i> All
+    </a>
+    @foreach (var category in Model)
+    {
+        active = "";
+        if (id == (category.Id).ToString() && controller == "Home" && action == "IndexCategory")
+        {
+            active = "active"; 
+        }
+        <a href="@Url.Action("IndexCategory/" + category.Id, "Home")" class="list-group-item @active">
+            <i class="fa fa-caret-right "></i> @category.name
+        </a>
+    }
+
+</div>

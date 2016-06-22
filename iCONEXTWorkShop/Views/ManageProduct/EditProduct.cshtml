@@ -1,0 +1,197 @@
+﻿@model iCONEXTWorkShop.ViewModels.EditProductViewModel
+
+<style>
+    .image-preview-input {
+        position: relative;
+        overflow: hidden;
+        margin: 0px;
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+    }
+
+        .image-preview-input input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
+
+    .image-preview-input-title {
+        margin-left: 2px;
+    }
+</style>
+<div class="container">
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-dismissible alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h5>@ViewBag.Message</h5>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Edit Product</h2>
+            <hr />
+        </div>
+    </div>
+    @using (@Html.BeginForm("EditProduct", "ManageProduct", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Title)
+                    @Html.TextBoxFor(x => x.Title, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Author)
+                    @Html.TextBoxFor(x => x.Author, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Price)
+                    @Html.TextBoxFor(x => x.Price, new { @class = "form-control", type = "number" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Isbn)
+                    @Html.TextBoxFor(x => x.Isbn, new { @class = "form-control", type = "number", max = "9999999999999" })
+                </div>
+            </div>
+            @*<div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Image)
+                    <div class="input-group image-preview">
+                        <input type="text" class="form-control image-preview-filename" disabled="disabled"> <!-- don't give a name === doesn't send on POST/GET -->
+                        <span class="input-group-btn">
+                            <!-- image-preview-clear button -->
+                            <button type="button" class="btn btn-default image-preview-clear" style="display: none;">
+                                <span class="glyphicon glyphicon-remove"></span> Clear
+                            </button>
+                            <!-- image-preview-input -->
+                            <div class="btn btn-default image-preview-input">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                                <span class="image-preview-input-title">Browse</span>
+                                <input type="file" id="file" name="file" accept="image/png, image/jpeg, image/gif" /> <!-- rename it -->
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>*@
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Detail)
+                    @Html.TextAreaFor(x => x.Detail, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Balance)
+                    @Html.TextBoxFor(x => x.Balance, new { @class = "form-control", type = "number" })
+                </div>
+            </div>
+            @*<div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.CategoryId)
+                    @Html.DropDownListFor(x => x.CategoryId, Model.Categories, new { @class = "form-control" })
+                </div>
+            </div>*@
+
+
+
+            <div class="col-md-4">
+                    <div class="form-group">
+                        <select name="CategoryId">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                    </div>
+                </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-success" type="submit" style="float: right; width: 150px;">Submit</button>
+            </div>
+        </div>
+    }
+</div>
+@section scripts {
+    <script>
+        $(document).on('click', '#close-preview', function () {
+            $('.image-preview').popover('hide');
+            // Hover befor close the preview
+            $('.image-preview').hover(
+                function () {
+                    $('.image-preview').popover('show');
+                },
+                 function () {
+                     $('.image-preview').popover('hide');
+                 }
+            );
+        });
+
+        $(function () {
+            // Create the close button
+            var closebtn = $('<button/>', {
+                type: "button",
+                text: 'x',
+                id: 'close-preview',
+                style: 'font-size: initial;',
+            });
+            closebtn.attr("class", "close pull-right");
+            // Set the popover default content
+            $('.image-preview').popover({
+                trigger: 'manual',
+                html: true,
+                title: "<strong>Preview</strong>" + $(closebtn)[0].outerHTML,
+                content: "There's no image",
+                placement: 'bottom'
+            });
+            // Clear event
+            $('.image-preview-clear').click(function () {
+                $('.image-preview').attr("data-content", "").popover('hide');
+                $('.image-preview-filename').val("");
+                $('.image-preview-clear').hide();
+                $('.image-preview-input input:file').val("");
+                $(".image-preview-input-title").text("Browse");
+            });
+            // Create the preview image
+            $(".image-preview-input input:file").change(function () {
+                var img = $('<img/>', {
+                    id: 'dynamic',
+                    width: 250,
+                    height: 200
+                });
+                var file = this.files[0];
+                var reader = new FileReader();
+                // Set preview image into the popover data-content
+                reader.onload = function (e) {
+                    $(".image-preview-input-title").text("Change");
+                    $(".image-preview-clear").show();
+                    $(".image-preview-filename").val(file.name);
+                    img.attr('src', e.target.result);
+                    $(".image-preview").attr("data-content", $(img)[0].outerHTML).popover("show");
+                }
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+}
+
+
+
+
